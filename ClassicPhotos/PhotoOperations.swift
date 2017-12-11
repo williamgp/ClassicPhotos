@@ -32,7 +32,7 @@ class PendingOperations {
     
     lazy var downloadsInProgress = [IndexPath:Operation]()
     var downloadQueue: OperationQueue {
-        var queue = OperationQueue()
+        let queue = OperationQueue()
         queue.name = "Download Queue"
         queue.maxConcurrentOperationCount = 1
         return queue
@@ -40,7 +40,7 @@ class PendingOperations {
     
     lazy var filtrationsInProgress = [IndexPath:Operation]()
     var filtrationQueue: OperationQueue {
-        var queue = OperationQueue()
+        let queue = OperationQueue()
         queue.name = "Filtrations Queue"
         queue.maxConcurrentOperationCount = 1
         return queue
@@ -60,7 +60,8 @@ class ImageDownloader: Operation {
         }
     
         guard let imageData = try? Data(contentsOf: self.photoRecord.url) else {
-            self.setImageAsFailed()
+            self.photoRecord.state = .Failed
+            self.photoRecord.image = UIImage(named: "Failed")
             return
         }
         
@@ -68,17 +69,8 @@ class ImageDownloader: Operation {
             return
         }
         
-        if imageData.count > 0 {
-            self.photoRecord.image = UIImage(data: imageData)
-            self.photoRecord.state = .Downloaded
-        } else {
-            self.setImageAsFailed()
-        }
-    }
-    
-    func setImageAsFailed() {
-        self.photoRecord.state = .Failed
-        self.photoRecord.image = UIImage(named: "Failed")
+        self.photoRecord.image = UIImage(data: imageData)
+        self.photoRecord.state = .Downloaded
     }
 }
 
